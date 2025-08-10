@@ -14,12 +14,14 @@
 import Foundation
 
 /// 記録に関するユースケース（ビジネス流れの調整）
-class RecordUseCase {
-    /// 月フォーマット用のスレッドセーフDateFormatter（ローカル生成）
-    private func createMonthFormatter() -> DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM"
-        return formatter
+final class RecordUseCase {
+    /// 月フォーマット処理（Calendar使用でパフォーマンス向上）
+    private func formatMonth(from date: Date) -> String {
+        let components = Calendar.current.dateComponents([.year, .month], from: date)
+        guard let year = components.year, let month = components.month else {
+            return "Unknown"
+        }
+        return String(format: "%04d-%02d", year, month)
     }
     private let repository: RecordRepositoryProtocol
 
@@ -52,7 +54,7 @@ class RecordUseCase {
 
     /// 月次合計金額を計算するビジネスロジック
     func calculateMonthlyTotal(for month: Date) -> Int {
-        DebugLogger.logBusinessAction("Calculating monthly total for: \(createMonthFormatter().string(from: month))")
+        DebugLogger.logBusinessAction("Calculating monthly total for: \(formatMonth(from: month))")
 
         let records = repository.getRecordsForMonth(month)
         let total = records.reduce(0) { $0 + $1.amount }
@@ -63,7 +65,7 @@ class RecordUseCase {
 
     /// カテゴリ別合計金額を計算するビジネスロジック
     func calculateCategoryTotals(for month: Date) -> [Category: Int] {
-        DebugLogger.logBusinessAction("Calculating category totals for: \(createMonthFormatter().string(from: month))")
+        DebugLogger.logBusinessAction("Calculating category totals for: \(formatMonth(from: month))")
 
         let records = repository.getRecordsForMonth(month)
 

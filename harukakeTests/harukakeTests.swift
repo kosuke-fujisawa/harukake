@@ -27,10 +27,12 @@ struct HarukakeTests {
             memo: "テスト記録"
         )
         
-        #expect(result.isSuccess)
-        if case .success(let record) = result {
+        switch result {
+        case .success(let record):
             #expect(record.amount == 1000)
             #expect(record.category == Category.shokuhi)
+        case .failure:
+            #expect(Bool(false), "Expected success but got failure")
         }
     }
     
@@ -48,7 +50,12 @@ struct HarukakeTests {
             memo: "無効な記録"
         )
         
-        #expect(result.isFailure)
+        switch result {
+        case .success:
+            #expect(Bool(false), "Expected failure but got success")
+        case .failure:
+            break // Expected
+        }
     }
     
     /// RecordUseCaseのバリデーション：負数での記録拒否
@@ -65,7 +72,12 @@ struct HarukakeTests {
             memo: "無効な記録"
         )
         
-        #expect(result.isFailure)
+        switch result {
+        case .success:
+            #expect(Bool(false), "Expected failure but got success")
+        case .failure:
+            break // Expected
+        }
     }
     
     /// 月次合計計算：同一月内の合計
@@ -81,8 +93,12 @@ struct HarukakeTests {
         let result1 = useCase.addRecord(date: testDate, category: Category.shokuhi, amount: 1000, memo: "記録1")
         let result2 = useCase.addRecord(date: sameMonthDate, category: Category.koutuu, amount: 500, memo: "記録2")
         
-        #expect(result1.isSuccess)
-        #expect(result2.isSuccess)
+        switch (result1, result2) {
+        case (.success, .success):
+            break // Expected
+        default:
+            #expect(Bool(false), "Expected both results to be success")
+        }
         
         let total = useCase.calculateMonthlyTotal(for: testDate)
         #expect(total == 1500)
@@ -101,8 +117,12 @@ struct HarukakeTests {
         let result1 = useCase.addRecord(date: thisMonth, category: Category.shokuhi, amount: 1000, memo: "今月")
         let result2 = useCase.addRecord(date: nextMonth, category: Category.shokuhi, amount: 2000, memo: "来月")
         
-        #expect(result1.isSuccess)
-        #expect(result2.isSuccess)
+        switch (result1, result2) {
+        case (.success, .success):
+            break // Expected
+        default:
+            #expect(Bool(false), "Expected both results to be success")
+        }
         
         let thisMonthTotal = useCase.calculateMonthlyTotal(for: thisMonth)
         #expect(thisMonthTotal == 1000)
@@ -120,9 +140,12 @@ struct HarukakeTests {
         let result2 = useCase.addRecord(date: testDate, category: Category.shokuhi, amount: 500, memo: "食費2")
         let result3 = useCase.addRecord(date: testDate, category: Category.koutuu, amount: 300, memo: "交通費")
         
-        #expect(result1.isSuccess)
-        #expect(result2.isSuccess)
-        #expect(result3.isSuccess)
+        switch (result1, result2, result3) {
+        case (.success, .success, .success):
+            break // Expected
+        default:
+            #expect(Bool(false), "Expected all results to be success")
+        }
         
         let categoryTotals = useCase.calculateCategoryTotals(for: testDate)
         

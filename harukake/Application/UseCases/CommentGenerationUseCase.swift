@@ -14,7 +14,7 @@
 import Foundation
 
 /// コメント生成に関するユースケース
-class CommentGenerationUseCase {
+final class CommentGenerationUseCase {
 
     /// 記録に基づいてコメントを生成するユースケース
     func generateComment(for record: RecordItem) -> Comment {
