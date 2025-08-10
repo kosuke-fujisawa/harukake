@@ -14,6 +14,7 @@
 import SwiftUI
 
 /// SwiftUIとの統合のためのObservableObjectラッパー（Infrastructure層）
+@MainActor
 class AppStateObservable: ObservableObject {
     @Published var records: [RecordItem] = [] {
         didSet {
@@ -28,23 +29,28 @@ class AppStateObservable: ObservableObject {
     private let commentUseCase: CommentGenerationUseCase
     private let repository: RecordRepositoryProtocol
 
-    init() {
-        self.repository = InMemoryRecordRepository()
+    init(repository: RecordRepositoryProtocol = InMemoryRecordRepository()) {
+        self.repository = repository
         self.recordUseCase = RecordUseCase(repository: repository)
         self.commentUseCase = CommentGenerationUseCase()
 
-        DebugLogger.logDataAction("AppStateObservable initialized")
+        DebugLogger.logDataAction("AppStateObservable initialized with repository: \(type(of: repository))")
         loadRecords()
     }
 
     /// 記録を追加し、コメントを生成
-    func addRecord(date: Date, category: Category, amount: Int, memo: String) {
-        guard let record = recordUseCase.addRecord(date: date, category: category, amount: amount, memo: memo) else {
-            return
+    func addRecord(date: Date, category: Category, amount: Int, memo: String) -> Result<RecordItem, RecordError> {
+        let result = recordUseCase.addRecord(date: date, category: category, amount: amount, memo: memo)
+        
+        switch result {
+        case .success(let record):
+            loadRecords()
+            generateComment(for: record)
+            return .success(record)
+        case .failure(let error):
+            DebugLogger.logError("Failed to add record in AppStateObservable: \(error.localizedDescription)")
+            return .failure(error)
         }
-
-        loadRecords()
-        generateComment(for: record)
     }
 
     /// 全記録を再読み込み

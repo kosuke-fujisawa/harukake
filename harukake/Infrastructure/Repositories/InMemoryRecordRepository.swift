@@ -14,7 +14,7 @@
 import Foundation
 
 /// インメモリでの記録データリポジトリ実装
-class InMemoryRecordRepository: RecordRepositoryProtocol {
+final class InMemoryRecordRepository: RecordRepositoryProtocol {
     private var records: [RecordItem] = []
 
     func getAllRecords() -> [RecordItem] {
