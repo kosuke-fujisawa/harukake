@@ -11,7 +11,7 @@
 import SwiftUI
 
 @main
-struct harukakeApp: App {
+struct HarukakeApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
