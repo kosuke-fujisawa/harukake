@@ -1,0 +1,72 @@
+# SwiftLint設定ファイル - harukake プロジェクト用
+# CLAUDE.md準拠のコード品質基準
+
+# 含めるパス
+included:
+  - harukake
+
+# 除外するパス
+excluded:
+  - Carthage
+  - Pods
+  - .build
+
+# 無効にするルール（開発効率とのバランス）
+disabled_rules:
+  - trailing_whitespace # 自動修正で対応
+  - todo # TODOコメントを許可（開発中）
+
+# 設定可能なルール
+identifier_name:
+  min_length: 2 # 変数名最小2文字
+  max_length: 50
+  excluded:
+    - id # UUID等で使用
+
+line_length:
+  warning: 120
+  error: 150
+  ignores_function_declarations: true
+  ignores_comments: true
+
+file_length:
+  warning: 400
+  error: 500
+
+function_body_length:
+  warning: 50
+  error: 100
+
+type_body_length:
+  warning: 300
+  error: 400
+
+# 強制するルール（品質向上）
+force_cast: error
+force_try: error
+
+# 段階的改善ルール
+large_tuple:
+  warning: 3
+  error: 4
+
+# コード品質ルール
+cyclomatic_complexity:
+  warning: 10
+  error: 20
+
+nesting:
+  type_level: 3
+
+# オプトインルール（段階的導入）
+opt_in_rules:
+  - empty_count
+  - explicit_init
+  - first_where
+  - joined_default_parameter
+  - redundant_nil_coalescing
+  - sorted_first_last
+  - vertical_parameter_alignment_on_call
+
+# カスタム警告レベル
+reporter: "xcode"
