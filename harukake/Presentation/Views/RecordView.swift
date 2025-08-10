@@ -19,9 +19,10 @@ struct RecordView: View {
     @State private var showingComment = false
     @State private var showingErrorAlert = false
     @State private var errorMessage = ""
+    @FocusState private var isAmountFieldFocused: Bool
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section("記録情報") {
                     DatePicker("日付", selection: $selectedDate, displayedComponents: .date)
@@ -37,6 +38,7 @@ struct RecordView: View {
                         TextField("0", text: $amount)
                             .keyboardType(.numberPad)
                             .multilineTextAlignment(.trailing)
+                            .focused($isAmountFieldFocused)
                         Text("円")
                     }
 
@@ -76,7 +78,7 @@ struct RecordView: View {
             }
             .alert("入力エラー", isPresented: $showingErrorAlert) {
                 Button("修正する") {
-                    // フォーカスを金額フィールドに戻す（代替案提示）
+                    isAmountFieldFocused = true
                 }
                 Button("キャンセル") {
                     clearForm()
@@ -88,27 +90,28 @@ struct RecordView: View {
     }
 
     private func saveRecord() {
-        guard let amountValue = Int(amount) else {
+        let trimmedAmount = amount.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard let amountValue = Int(trimmedAmount) else {
             showError("金額には数値を入力してください。\n例：1000、500")
             return
         }
 
-        guard amountValue > 0 else {
-            showError("金額は1円以上で入力してください。\n入力値: \(amountValue)円")
-            return
-        }
-
-        appState.addRecord(
+        let result = appState.addRecord(
             date: selectedDate,
             category: selectedCategory,
             amount: amountValue,
-            memo: memo
+            memo: memo.trimmingCharacters(in: .whitespacesAndNewlines)
         )
 
-        clearForm()
-
-        DebugLogger.logUIAction("Opening CommentSheet")
-        showingComment = true
+        switch result {
+        case .success:
+            clearForm()
+            DebugLogger.logUIAction("Opening CommentSheet")
+            showingComment = true
+        case .failure(let error):
+            showError(error.localizedDescription + "\n\n" + (error.recoverySuggestion ?? ""))
+        }
     }
 
     /// エラーメッセージを表示（代替案提示付き）

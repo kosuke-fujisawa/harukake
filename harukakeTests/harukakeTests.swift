@@ -18,16 +18,20 @@ struct HarukakeTests {
         let repository = InMemoryRecordRepository()
         let useCase = RecordUseCase(repository: repository)
         
-        let record = useCase.addRecord(
-            date: Date(),
+        let testDate = Calendar.current.date(from: DateComponents(year: 2024, month: 1, day: 15))!
+        
+        let result = useCase.addRecord(
+            date: testDate,
             category: Category.shokuhi,
             amount: 1000,
             memo: "テスト記録"
         )
         
-        #expect(record != nil)
-        #expect(record?.amount == 1000)
-        #expect(record?.category == Category.shokuhi)
+        #expect(result.isSuccess)
+        if case .success(let record) = result {
+            #expect(record.amount == 1000)
+            #expect(record.category == Category.shokuhi)
+        }
     }
     
     /// RecordUseCaseのバリデーション：0円での記録拒否
@@ -35,14 +39,16 @@ struct HarukakeTests {
         let repository = InMemoryRecordRepository()
         let useCase = RecordUseCase(repository: repository)
         
-        let record = useCase.addRecord(
-            date: Date(),
+        let testDate = Calendar.current.date(from: DateComponents(year: 2024, month: 1, day: 15))!
+        
+        let result = useCase.addRecord(
+            date: testDate,
             category: Category.shokuhi,
             amount: 0,
             memo: "無効な記録"
         )
         
-        #expect(record == nil)
+        #expect(result.isFailure)
     }
     
     /// RecordUseCaseのバリデーション：負数での記録拒否
@@ -50,14 +56,16 @@ struct HarukakeTests {
         let repository = InMemoryRecordRepository()
         let useCase = RecordUseCase(repository: repository)
         
-        let record = useCase.addRecord(
-            date: Date(),
+        let testDate = Calendar.current.date(from: DateComponents(year: 2024, month: 1, day: 15))!
+        
+        let result = useCase.addRecord(
+            date: testDate,
             category: Category.shokuhi,
             amount: -500,
             memo: "無効な記録"
         )
         
-        #expect(record == nil)
+        #expect(result.isFailure)
     }
     
     /// 月次合計計算：同一月内の合計
@@ -65,12 +73,16 @@ struct HarukakeTests {
         let repository = InMemoryRecordRepository()
         let useCase = RecordUseCase(repository: repository)
         
+        // 固定日付を使用して安定性を確保
         let calendar = Calendar.current
-        let testDate = Date()
-        let sameMonthDate = calendar.date(byAdding: .day, value: 5, to: testDate)!
+        let testDate = calendar.date(from: DateComponents(year: 2024, month: 1, day: 15))!
+        let sameMonthDate = calendar.date(from: DateComponents(year: 2024, month: 1, day: 20))!
         
-        useCase.addRecord(date: testDate, category: Category.shokuhi, amount: 1000, memo: "記録1")
-        useCase.addRecord(date: sameMonthDate, category: Category.koutuu, amount: 500, memo: "記録2")
+        let result1 = useCase.addRecord(date: testDate, category: Category.shokuhi, amount: 1000, memo: "記録1")
+        let result2 = useCase.addRecord(date: sameMonthDate, category: Category.koutuu, amount: 500, memo: "記録2")
+        
+        #expect(result1.isSuccess)
+        #expect(result2.isSuccess)
         
         let total = useCase.calculateMonthlyTotal(for: testDate)
         #expect(total == 1500)
@@ -81,12 +93,16 @@ struct HarukakeTests {
         let repository = InMemoryRecordRepository()
         let useCase = RecordUseCase(repository: repository)
         
+        // 固定日付を使用して安定性を確保
         let calendar = Calendar.current
-        let thisMonth = Date()
-        let nextMonth = calendar.date(byAdding: .month, value: 1, to: thisMonth)!
+        let thisMonth = calendar.date(from: DateComponents(year: 2024, month: 1, day: 15))!
+        let nextMonth = calendar.date(from: DateComponents(year: 2024, month: 2, day: 15))!
         
-        useCase.addRecord(date: thisMonth, category: Category.shokuhi, amount: 1000, memo: "今月")
-        useCase.addRecord(date: nextMonth, category: Category.shokuhi, amount: 2000, memo: "来月")
+        let result1 = useCase.addRecord(date: thisMonth, category: Category.shokuhi, amount: 1000, memo: "今月")
+        let result2 = useCase.addRecord(date: nextMonth, category: Category.shokuhi, amount: 2000, memo: "来月")
+        
+        #expect(result1.isSuccess)
+        #expect(result2.isSuccess)
         
         let thisMonthTotal = useCase.calculateMonthlyTotal(for: thisMonth)
         #expect(thisMonthTotal == 1000)
@@ -97,11 +113,16 @@ struct HarukakeTests {
         let repository = InMemoryRecordRepository()
         let useCase = RecordUseCase(repository: repository)
         
-        let testDate = Date()
+        // 固定日付を使用して安定性を確保
+        let testDate = Calendar.current.date(from: DateComponents(year: 2024, month: 1, day: 15))!
         
-        useCase.addRecord(date: testDate, category: Category.shokuhi, amount: 1000, memo: "食費1")
-        useCase.addRecord(date: testDate, category: Category.shokuhi, amount: 500, memo: "食費2")
-        useCase.addRecord(date: testDate, category: Category.koutuu, amount: 300, memo: "交通費")
+        let result1 = useCase.addRecord(date: testDate, category: Category.shokuhi, amount: 1000, memo: "食費1")
+        let result2 = useCase.addRecord(date: testDate, category: Category.shokuhi, amount: 500, memo: "食費2")
+        let result3 = useCase.addRecord(date: testDate, category: Category.koutuu, amount: 300, memo: "交通費")
+        
+        #expect(result1.isSuccess)
+        #expect(result2.isSuccess)
+        #expect(result3.isSuccess)
         
         let categoryTotals = useCase.calculateCategoryTotals(for: testDate)
         

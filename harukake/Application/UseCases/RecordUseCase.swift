@@ -15,12 +15,12 @@ import Foundation
 
 /// 記録に関するユースケース（ビジネス流れの調整）
 class RecordUseCase {
-    /// 月フォーマット用の静的DateFormatter（重複排除）
-    private static let monthFormatter: DateFormatter = {
+    /// 月フォーマット用のスレッドセーフDateFormatter（ローカル生成）
+    private func createMonthFormatter() -> DateFormatter {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM"
         return formatter
-    }()
+    }
     private let repository: RecordRepositoryProtocol
 
     init(repository: RecordRepositoryProtocol) {
@@ -28,18 +28,21 @@ class RecordUseCase {
     }
 
     /// 記録を追加するユースケース
-    func addRecord(date: Date, category: Category, amount: Int, memo: String) -> RecordItem? {
+    func addRecord(date: Date, category: Category, amount: Int, memo: String) -> Result<RecordItem, RecordError> {
         let record = RecordItem(date: date, category: category, amount: amount, memo: memo)
 
         guard record.isValidAmount else {
-            DebugLogger.logError("Invalid amount: \(amount)")
-            return nil
+            let error = RecordError.invalidAmount(amount)
+            DebugLogger.logError("Failed to add record: \(error.localizedDescription)")
+            return .failure(error)
         }
 
         repository.addRecord(record)
-        DebugLogger.logBusinessAction("Record added - Category: \(category.displayName), Amount: ¥\(amount)")
+        DebugLogger.logBusinessAction(
+            "Record added successfully - Category: \(category.displayName), Amount: ¥\(amount)"
+        )
 
-        return record
+        return .success(record)
     }
 
     /// 全記録を取得するユースケース
@@ -49,7 +52,7 @@ class RecordUseCase {
 
     /// 月次合計金額を計算するビジネスロジック
     func calculateMonthlyTotal(for month: Date) -> Int {
-        DebugLogger.logBusinessAction("Calculating monthly total for: \(Self.monthFormatter.string(from: month))")
+        DebugLogger.logBusinessAction("Calculating monthly total for: \(createMonthFormatter().string(from: month))")
 
         let records = repository.getRecordsForMonth(month)
         let total = records.reduce(0) { $0 + $1.amount }
@@ -60,7 +63,7 @@ class RecordUseCase {
 
     /// カテゴリ別合計金額を計算するビジネスロジック
     func calculateCategoryTotals(for month: Date) -> [Category: Int] {
-        DebugLogger.logBusinessAction("Calculating category totals for: \(Self.monthFormatter.string(from: month))")
+        DebugLogger.logBusinessAction("Calculating category totals for: \(createMonthFormatter().string(from: month))")
 
         let records = repository.getRecordsForMonth(month)
 
