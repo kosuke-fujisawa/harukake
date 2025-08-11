@@ -11,20 +11,14 @@
 import SwiftUI
 
 /// ホーム画面下部のメインメニューバー
-/// 記録、分析、ストーリー、設定へのアクセスを提供
+/// 分析、ストーリー、設定へのアクセスを提供（記録は右下FABに統合）
 struct BottomMenuBar: View {
-    @Binding var showingRecord: Bool
     @Binding var showingAnalytics: Bool
     @Binding var showingStory: Bool
     @Binding var showingSettings: Bool
     
     var body: some View {
         HStack(spacing: 32) {
-            BottomItem(icon: "square.and.pencil", title: "記録") {
-                DebugLogger.logUIAction("Opening RecordSheet from BottomMenuBar")
-                showingRecord = true
-            }
-            
             BottomItem(icon: "chart.bar.xaxis", title: "分析") {
                 DebugLogger.logUIAction("Opening AnalyticsSheet from BottomMenuBar")
                 showingAnalytics = true
@@ -39,6 +33,9 @@ struct BottomMenuBar: View {
                 DebugLogger.logUIAction("Opening SettingsSheet from BottomMenuBar")
                 showingSettings = true
             }
+            
+            // 右端の空きスペース
+            Spacer(minLength: 80)
         }
         .frame(height: 72)
         .frame(maxWidth: .infinity)
@@ -64,13 +61,13 @@ struct BottomItem: View {
         Button(action: action) {
             VStack(spacing: 8) {
                 Image(systemName: icon)
-                    .font(.system(size: 24, weight: .medium))
+                    .font(.system(size: 22, weight: .medium))
                     .foregroundColor(.white)
                     .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
                     .frame(height: 24)
                 
                 Text(title)
-                    .font(.caption)
+                    .font(.system(size: 12))
                     .fontWeight(.medium)
                     .foregroundColor(.white)
                     .shadow(color: .black.opacity(0.5), radius: 1, x: 0, y: 1)
@@ -95,7 +92,6 @@ struct BottomItem: View {
         VStack {
             Spacer()
             BottomMenuBar(
-                showingRecord: .constant(false),
                 showingAnalytics: .constant(false),
                 showingStory: .constant(false),
                 showingSettings: .constant(false)

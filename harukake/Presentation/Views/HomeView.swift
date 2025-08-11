@@ -104,10 +104,16 @@ struct HomeView: View {
                         .padding(.horizontal, 20)
                         .padding(.bottom, 120) // 下部バー + マージン
                         .transition(.asymmetric(
-                            insertion: .scale(scale: 0.8, anchor: bubble.side == .left ? .bottomLeading : .bottomTrailing)
+                            insertion: .scale(
+                                scale: 0.8, 
+                                anchor: bubble.side == .left ? .bottomLeading : .bottomTrailing
+                            )
                                 .combined(with: .opacity)
                                 .animation(.spring(response: 0.4, dampingFraction: 0.8)),
-                            removal: .scale(scale: 0.9, anchor: bubble.side == .left ? .bottomLeading : .bottomTrailing)
+                            removal: .scale(
+                                scale: 0.9, 
+                                anchor: bubble.side == .left ? .bottomLeading : .bottomTrailing
+                            )
                                 .combined(with: .opacity)
                                 .animation(.easeOut(duration: 0.2))
                         ))

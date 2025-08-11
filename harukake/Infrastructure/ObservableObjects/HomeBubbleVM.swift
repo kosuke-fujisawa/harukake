@@ -138,7 +138,9 @@ class HomeBubbleVM: ObservableObject {
         }
         
         // ログ出力
-        DebugLogger.logUIAction("home.bubble_shown {character: \"\(selectedCharacter.rawValue)\", line_id: \"\(selectedLine.id)\"}")
+        DebugLogger.logUIAction(
+            "home.bubble_shown {character: \"\(selectedCharacter.rawValue)\", line_id: \"\(selectedLine.id)\"}"
+        )
     }
     
     /// 吹き出しを非表示
@@ -165,7 +167,10 @@ class HomeBubbleVM: ObservableObject {
     }
     
     /// 台詞選択（直前と同じ台詞を避ける）
-    private func selectLine(for character: CharacterID, from data: DialogueData) -> DialogueLine {
+    private func selectLine(
+        for character: CharacterID, 
+        from data: DialogueData
+    ) -> DialogueLine {
         var availableLines = data.lines(for: character)
         
         // 直前の台詞を除外（在庫が1本しかない場合は許容）

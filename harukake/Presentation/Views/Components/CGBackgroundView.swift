@@ -28,7 +28,6 @@ struct CGBackgroundView: View {
                     .resizable()
                     .scaledToFill()
                     .ignoresSafeArea()
-                    .clipped()
                     .overlay {
                         // 上下に薄いグラデーションを追加（UI可読性向上）
                         LinearGradient(
