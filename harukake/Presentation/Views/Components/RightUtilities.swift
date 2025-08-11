@@ -23,6 +23,8 @@ struct UtilityButtonStyle: ButtonStyle {
 struct UtilityButton: View {
     let icon: String
     let iconColor: Color
+    let accessibilityLabel: String
+    let accessibilityHint: String
     let action: () -> Void
     
     var body: some View {
@@ -40,6 +42,8 @@ struct UtilityButton: View {
                 .shadow(color: .black.opacity(0.15), radius: 3, x: 0, y: 2)
         }
         .buttonStyle(UtilityButtonStyle())
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityHint(accessibilityHint)
     }
 }
 
@@ -55,7 +59,9 @@ struct RightUtilities: View {
             
             UtilityButton(
                 icon: "questionmark.circle",
-                iconColor: .white
+                iconColor: .white,
+                accessibilityLabel: "ヘルプ",
+                accessibilityHint: "ヘルプ画面を開きます"
             ) {
                 DebugLogger.logUIAction("Opening HelpSheet from RightUtilities")
                 showingHelp = true
@@ -63,7 +69,9 @@ struct RightUtilities: View {
             
             UtilityButton(
                 icon: "line.3.horizontal",
-                iconColor: .white
+                iconColor: .white,
+                accessibilityLabel: "設定",
+                accessibilityHint: "設定画面を開きます"
             ) {
                 DebugLogger.logUIAction("Opening SettingsSheet from RightUtilities")
                 showingSettings = true
