@@ -10,6 +10,15 @@
 
 import SwiftUI
 
+/// ユーティリティボタン用のカスタムButtonStyle（押下アニメーション付き）
+struct UtilityButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
+            .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
+    }
+}
+
 /// 再利用可能なユーティリティボタンコンポーネント
 struct UtilityButton: View {
     let icon: String
@@ -30,7 +39,7 @@ struct UtilityButton: View {
                 )
                 .shadow(color: .black.opacity(0.15), radius: 3, x: 0, y: 2)
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(UtilityButtonStyle())
     }
 }
 
@@ -41,8 +50,17 @@ struct RightUtilities: View {
     @State private var showingHelp = false
     
     var body: some View {
-        HStack {
+        HStack(spacing: 12) {
             Spacer()
+            
+            UtilityButton(
+                icon: "questionmark.circle",
+                iconColor: .white
+            ) {
+                DebugLogger.logUIAction("Opening HelpSheet from RightUtilities")
+                showingHelp = true
+            }
+            
             UtilityButton(
                 icon: "line.3.horizontal",
                 iconColor: .white
@@ -50,9 +68,9 @@ struct RightUtilities: View {
                 DebugLogger.logUIAction("Opening SettingsSheet from RightUtilities")
                 showingSettings = true
             }
-            .padding(.trailing, 16)
-            .padding(.top, 16)
         }
+        .padding(.trailing, 16)
+        .padding(.top, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
         .sheet(isPresented: $showingHelp) {
             HelpView()
