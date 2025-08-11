@@ -2,10 +2,10 @@
 //  BottomMenuBar.swift
 //  harukake
 //
-//  This project is licensed under the CC BY-NC 4.0 license.
-//  See the LICENSE file in the project root for full license information.
+//  このプロジェクトは CC BY-NC 4.0 ライセンスの下でライセンスされています。
+//  プロジェクトルートのLICENSEファイルで完全なライセンス情報を参照してください。
 //
-//  Non-commercial use only.
+//  非営利使用のみ。
 //
 
 import SwiftUI
@@ -80,17 +80,11 @@ struct BottomItem: View {
         }
         .buttonStyle(PlainButtonStyle())
         .scaleEffect(isPressed ? 0.9 : 1.0)
-        .onTapGesture {
+        .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity, pressing: { pressing in
             withAnimation(.easeInOut(duration: 0.1)) {
-                isPressed = true
+                isPressed = pressing
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                withAnimation(.easeInOut(duration: 0.1)) {
-                    isPressed = false
-                }
-            }
-            action()
-        }
+        }, perform: {})
         .accessibilityLabel(title)
     }
 }

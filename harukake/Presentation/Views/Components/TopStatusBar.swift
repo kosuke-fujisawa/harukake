@@ -2,10 +2,10 @@
 //  TopStatusBar.swift
 //  harukake
 //
-//  This project is licensed under the CC BY-NC 4.0 license.
-//  See the LICENSE file in the project root for full license information.
+//  このプロジェクトは CC BY-NC 4.0 ライセンスの下でライセンスされています。
+//  プロジェクトルートのLICENSEファイルで完全なライセンス情報を参照してください。
 //
-//  Non-commercial use only.
+//  非営利使用のみ。
 //
 
 import SwiftUI
@@ -38,12 +38,16 @@ struct TopStatusBar: View {
         .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
     }
     
-    private func formatCurrency(_ amount: Int) -> String {
+    private static let currencyFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.locale = Locale(identifier: "ja_JP")
         formatter.maximumFractionDigits = 0
-        return formatter.string(from: NSNumber(value: amount)) ?? "¥0"
+        return formatter
+    }()
+    
+    private func formatCurrency(_ amount: Int) -> String {
+        return Self.currencyFormatter.string(from: NSNumber(value: amount)) ?? "¥0"
     }
 }
 

@@ -2,13 +2,14 @@
 //  CGBackgroundView.swift
 //  harukake
 //
-//  This project is licensed under the CC BY-NC 4.0 license.
-//  See the LICENSE file in the project root for full license information.
+//  このプロジェクトは CC BY-NC 4.0 ライセンスの下でライセンスされています。
+//  プロジェクトルートのLICENSEファイルで完全なライセンス情報を参照してください。
 //
-//  Non-commercial use only.
+//  非営利使用のみ。
 //
 
 import SwiftUI
+import UIKit
 
 /// 背景CGを表示するビューコンポーネント
 /// 端末サイズに応じたスケーリングとトリミング制御を行う
@@ -39,9 +40,11 @@ struct CGBackgroundView: View {
                             startPoint: .top,
                             endPoint: .bottom
                         )
+                        .allowsHitTesting(false)
                     }
                     .transition(.opacity.animation(.easeInOut(duration: 0.25)))
                     .accessibilityHidden(true)
+                    .allowsHitTesting(false)
             } else {
                 // 画像が読み込めない場合のフォールバック
                 Rectangle()
@@ -66,6 +69,7 @@ struct CGBackgroundView: View {
                         }
                     }
                     .accessibilityHidden(true)
+                    .allowsHitTesting(false)
             }
         }
     }

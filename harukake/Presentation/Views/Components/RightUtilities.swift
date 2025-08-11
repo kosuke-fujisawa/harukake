@@ -2,10 +2,10 @@
 //  RightUtilities.swift
 //  harukake
 //
-//  This project is licensed under the CC BY-NC 4.0 license.
-//  See the LICENSE file in the project root for full license information.
+//  このプロジェクトは CC BY-NC 4.0 ライセンスの下でライセンスされています。
+//  プロジェクトルートのLICENSEファイルで完全なライセンス情報を参照してください。
 //
-//  Non-commercial use only.
+//  非営利使用のみ。
 //
 
 import SwiftUI

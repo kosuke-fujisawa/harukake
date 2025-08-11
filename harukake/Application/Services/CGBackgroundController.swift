@@ -2,13 +2,14 @@
 //  CGBackgroundController.swift
 //  harukake
 //
-//  This project is licensed under the CC BY-NC 4.0 license.
-//  See the LICENSE file in the project root for full license information.
+//  このプロジェクトは CC BY-NC 4.0 ライセンスの下でライセンスされています。
+//  プロジェクトルートのLICENSEファイルで完全なライセンス情報を参照してください。
 //
-//  Non-commercial use only.
+//  非営利使用のみ。
 //
 
 import SwiftUI
+import UIKit
 
 /// CG背景の切り替えと管理を担当するコントローラー
 /// 章進行・時間帯・キャラに応じて背景CGを切り替える
@@ -17,8 +18,11 @@ final class CGBackgroundController: ObservableObject {
     @Published var currentImageName: String = "cg_home_default"
     
     // MARK: - 設定関連
-    @AppStorage("backgroundCGAnimationEnabled") private var animationEnabled = true
-    @AppStorage("backgroundCGAutoSwitch") private var autoSwitchEnabled = true
+    private static let animationEnabledKey = "backgroundCGAnimationEnabled"
+    private static let autoSwitchEnabledKey = "backgroundCGAutoSwitch"
+    
+    @AppStorage(animationEnabledKey) private var animationEnabled = true
+    @AppStorage(autoSwitchEnabledKey) private var autoSwitchEnabled = true
     
     // MARK: - 背景切り替えメソッド
     /// 指定した背景CGに切り替える
