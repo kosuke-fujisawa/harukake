@@ -9,7 +9,6 @@
 //
 
 import SwiftUI
-import Combine
 
 struct HomeView: View {
     @StateObject private var cgController = CGBackgroundController()
@@ -22,7 +21,6 @@ struct HomeView: View {
     @State private var showingMessages = false
     @State private var showingMissions = false
     @State private var showingPresents = false
-    @State private var keyboardHeight: CGFloat = 0
 
     var body: some View {
         ZStack {
