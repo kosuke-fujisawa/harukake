@@ -225,6 +225,89 @@ struct ContentView: View  // TabView container
 - **メインストーリー**: 3章（Lv1, Lv5, Lv10で解放）
 - **サイドストーリー**: 各キャラ2話（ジュエル3/5で解放）
 
+---
+
+## ホーム画面レイヤー構成
+
+### 4層レイヤー構造
+
+```
+┌─────────────────────────────────────────────┐
+│ 4. UI オーバーレイ                            │
+│ ┌─────────────────┐ ┌─────────────────┐      │
+│ │ TopStatusBar    │ │ RightUtilities  │      │
+│ │ (Lv/支出/貯金)   │ │ (Help/Settings) │      │
+│ └─────────────────┘ └─────────────────┘      │
+│ ┌─────────────────┐                          │
+│ │ LeftShortcuts   │                          │
+│ │ (Msg/Mission)   │                          │
+│ └─────────────────┘                          │
+│ ┌─────────────────────────────────────────┐  │
+│ │            BottomMenuBar                │  │
+│ │     [記録][分析][ストーリー][設定]        │  │
+│ └─────────────────────────────────────────┘  │
+├─────────────────────────────────────────────┤
+│ 3. 立ち絵レイヤー (CharacterLayer)             │
+│    将来のLive2D対応想定                       │
+├─────────────────────────────────────────────┤
+│ 2. 背景CG (CGBackgroundView)                 │
+│    時間帯・章進行での自動切り替え               │
+├─────────────────────────────────────────────┤
+│ 1. ベース背景                                │
+│    フォールバック用グラデーション               │
+└─────────────────────────────────────────────┘
+```
+
+### アセット命名規則
+
+#### 背景CG画像
+```
+Asset Catalog: harukake/Assets.xcassets/
+
+cg_home_default.imageset/     # 初期・デフォルト背景
+  ├─ cg_home_default.png      # 1x (640×360)
+  ├─ cg_home_default@2x.png   # 2x (1280×720)
+  └─ cg_home_default@3x.png   # 3x (1920×1080)
+
+# 時間帯差分 (将来実装)
+cg_home_day.imageset/         # 昼間背景 (6:00-17:59)
+cg_home_evening.imageset/     # 夕方背景 (18:00-21:59)  
+cg_home_night.imageset/       # 夜間背景 (22:00-5:59)
+
+# 章進行差分 (将来実装)
+cg_home_chapter1.imageset/    # 第1章解放時
+cg_home_chapter2.imageset/    # 第2章解放時
+cg_home_chapter3.imageset/    # 第3章解放時
+```
+
+#### 推奨画像仕様
+- **アスペクト比**: 16:9 (横長)
+- **最小解像度**: 
+  - 1x: 640×360px
+  - 2x: 1280×720px
+  - 3x: 1920×1080px以上
+- **フォーマット**: PNG (透明度不要) または JPG
+- **構図**: 重要な被写体は中央〜右寄りに配置（左側にUIが重なる）
+- **明度**: UI文字の可読性を考慮し、上下20%エリアは暗めに調整
+
+### アーキテクチャマッピング
+
+```
+Presentation層/
+├─ Views/
+│  ├─ HomeView.swift                    # メイン画面・4層構造
+│  └─ Components/
+│     ├─ CGBackgroundView.swift         # 背景CG表示
+│     ├─ TopStatusBar.swift             # 上部ステータス
+│     ├─ LeftShortcuts.swift            # 左側ショートカット
+│     ├─ RightUtilities.swift           # 右上ユーティリティ
+│     └─ BottomMenuBar.swift            # 下部メニュー
+
+Application層/
+└─ Services/
+   └─ CGBackgroundController.swift      # CG切り替え制御
+```
+
 ## ライセンス
 
 このプロジェクトは **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)** の下でライセンスされています。

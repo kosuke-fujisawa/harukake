@@ -11,6 +11,7 @@
 import SwiftUI
 
 struct HomeView: View {
+    @StateObject private var cgController = CGBackgroundController()
     @State private var showingRecord = false
     @State private var showingAnalytics = false
     @State private var showingStory = false
@@ -19,118 +20,56 @@ struct HomeView: View {
     @State private var showingMissions = false
 
     var body: some View {
-        NavigationView {
-            VStack(spacing: 20) {
-                // ヘッダー（ハンバーガーメニューと設定）
-                HStack {
-                    Button {
-                        DebugLogger.logUIAction("Opening MessagesSheet")
-                        showingMessages = true
-                    } label: {
-                        Image(systemName: "bubble.left.and.bubble.right")
-                            .font(.title2)
-                    }
-
-                    Spacer()
-
-                    Button {
-                        DebugLogger.logUIAction("Opening MissionsSheet")
-                        showingMissions = true
-                    } label: {
-                        Image(systemName: "target")
-                            .font(.title2)
-                    }
-
-                    Button {
-                        DebugLogger.logUIAction("Opening SettingsSheet")
-                        showingSettings = true
-                    } label: {
-                        Image(systemName: "line.3.horizontal")
-                            .font(.title2)
-                    }
-                }
-                .padding(.horizontal)
-
-                // メインコンテンツエリア
-                VStack(spacing: 20) {
-                    Text("遥かなる家計管理の道のり")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .multilineTextAlignment(.center)
-
-                    Text("今日も記録を続けて、\n目標の100万円を目指そう！")
-                        .font(.body)
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(.secondary)
-
-                    // 現在の進行状況表示
-                    VStack(spacing: 10) {
-                        Text("現在の貯金額")
-                            .font(.headline)
-
-                        Text("¥0")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.primary)
-
-                        ProgressView(value: 0.0, total: 1000000.0)
-                            .progressViewStyle(LinearProgressViewStyle())
-                            .frame(height: 10)
-                            .padding(.horizontal, 40)
-                    }
-                    .padding()
-                    .background(Color.secondary.opacity(0.1))
-                    .cornerRadius(15)
-                }
-
+        ZStack {
+            // 1) 背景CG（常時表示）
+            CGBackgroundView(image: cgController.currentImageName)
+                .ignoresSafeArea()
+            
+            // 2) 立ち絵レイヤー（今回はスキップ）
+            // CharacterLayerView()
+            
+            // 3) UIオーバーレイ
+            VStack(spacing: 0) {
+                // 上部ステータスバー
+                TopStatusBar()
+                    .padding(.horizontal, 16)
+                    .padding(.top, 8)
+                
                 Spacer()
-
-                // 下部ナビゲーションバー
-                HStack(spacing: 0) {
-                    NavigationButton(
-                        icon: "square.and.pencil",
-                        title: "記録",
-                        action: {
-                            DebugLogger.logUIAction("Opening RecordSheet")
-                            showingRecord = true
-                        }
-                    )
-
-                    NavigationButton(
-                        icon: "chart.bar.xaxis",
-                        title: "分析",
-                        action: {
-                            DebugLogger.logUIAction("Opening AnalyticsSheet")
-                            showingAnalytics = true
-                        }
-                    )
-
-                    NavigationButton(
-                        icon: "book",
-                        title: "ストーリー",
-                        action: {
-                            DebugLogger.logUIAction("Opening StorySheet")
-                            showingStory = true
-                        }
-                    )
-
-                    NavigationButton(
-                        icon: "gear",
-                        title: "設定",
-                        action: {
-                            DebugLogger.logUIAction("Opening SettingsSheet")
-                            showingSettings = true
-                        }
-                    )
-                }
-                .padding(.horizontal)
-                .padding(.vertical, 10)
-                .background(Color.secondary.opacity(0.1))
-                .cornerRadius(20)
             }
-            .padding()
-            .navigationTitle("ホーム")
-            .navigationBarTitleDisplayMode(.inline)
+            
+            // 左側ショートカット
+            LeftShortcuts(
+                showingMessages: $showingMessages,
+                showingMissions: $showingMissions
+            )
+            .padding(.leading, 12)
+            .padding(.top, 72)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            
+            // 右上ユーティリティ
+            RightUtilities(showingSettings: $showingSettings)
+                .padding(.trailing, 12)
+                .padding(.top, 8)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+            
+            // 4) コメントオーバーレイ（将来実装）
+            // CommentOverlay()
+        }
+        .safeAreaInset(edge: .bottom) {
+            BottomMenuBar(
+                showingRecord: $showingRecord,
+                showingAnalytics: $showingAnalytics,
+                showingStory: $showingStory,
+                showingSettings: $showingSettings
+            )
+        }
+        .task {
+            await cgController.preload()
+            cgController.updateForTimeOfDay()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didReceiveMemoryWarningNotification)) { _ in
+            cgController.handleMemoryWarning()
         }
         .sheet(isPresented: $showingRecord) {
             RecordView()
