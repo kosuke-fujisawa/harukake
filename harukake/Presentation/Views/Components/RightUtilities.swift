@@ -10,6 +10,30 @@
 
 import SwiftUI
 
+/// 再利用可能なユーティリティボタンコンポーネント
+struct UtilityButton: View {
+    let icon: String
+    let iconColor: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 20, weight: .medium))
+                .foregroundColor(iconColor)
+                .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
+                .frame(width: 44, height: 44)
+                .background(.ultraThinMaterial, in: Circle())
+                .overlay(
+                    Circle()
+                        .strokeBorder(.white.opacity(0.3), lineWidth: 1)
+                )
+                .shadow(color: .black.opacity(0.15), radius: 3, x: 0, y: 2)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
 /// ホーム画面右上のユーティリティボタン群
 /// 設定、ヘルプなどへのアクセスを提供
 struct RightUtilities: View {
@@ -19,23 +43,13 @@ struct RightUtilities: View {
     var body: some View {
         HStack {
             Spacer()
-            Button {
+            UtilityButton(
+                icon: "line.3.horizontal",
+                iconColor: .white
+            ) {
                 DebugLogger.logUIAction("Opening SettingsSheet from RightUtilities")
                 showingSettings = true
-            } label: {
-                Image(systemName: "line.3.horizontal")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundColor(.white)
-                    .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
-                    .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
-                    .overlay(
-                        Circle()
-                            .strokeBorder(.white.opacity(0.3), lineWidth: 1)
-                    )
-                    .shadow(color: .black.opacity(0.15), radius: 3, x: 0, y: 2)
             }
-            .buttonStyle(PlainButtonStyle())
             .padding(.trailing, 16)
             .padding(.top, 16)
         }
@@ -43,45 +57,6 @@ struct RightUtilities: View {
         .sheet(isPresented: $showingHelp) {
             HelpView()
         }
-    }
-}
-
-/// ユーティリティボタンの個別コンポーネント
-struct UtilityButton: View {
-    let icon: String
-    let iconColor: Color
-    let backgroundColor: Color
-    let action: () -> Void
-    
-    @State private var isPressed = false
-    
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: icon)
-                .font(.system(size: 20, weight: .medium))
-                .foregroundColor(iconColor)
-                .frame(width: 44, height: 44)
-                .background(backgroundColor, in: Circle())
-                .overlay(
-                    Circle()
-                        .strokeBorder(.white.opacity(0.3), lineWidth: 1)
-                )
-                .shadow(color: .black.opacity(0.15), radius: 3, x: 0, y: 2)
-        }
-        .buttonStyle(PlainButtonStyle())
-        .scaleEffect(isPressed ? 0.9 : 1.0)
-        .onTapGesture {
-            withAnimation(.easeInOut(duration: 0.1)) {
-                isPressed = true
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                withAnimation(.easeInOut(duration: 0.1)) {
-                    isPressed = false
-                }
-            }
-            action()
-        }
-        .accessibilityLabel(icon == "questionmark.circle.fill" ? "ヘルプ" : "設定")
     }
 }
 
