@@ -11,8 +11,8 @@
 //  Non-commercial use only.
 //
 
-import SwiftUI
 import Foundation
+import Combine
 
 /// SwiftUIとの統合のためのObservableObjectラッパー（Infrastructure層）
 @MainActor

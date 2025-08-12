@@ -20,6 +20,7 @@ struct RecordItem: Identifiable, Equatable {
     let category: Category
     let amount: Int
     let memo: String
+    // TODO: 支払い元の実装（現金・クレジットカード・電子マネー等）
 
     init(date: Date, category: Category, amount: Int, memo: String = "") {
         self.date = date

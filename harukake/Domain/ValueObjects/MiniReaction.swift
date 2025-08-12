@@ -15,16 +15,13 @@ import Foundation
 
 /// ミニキャラクター＋コメント表示用の値オブジェクト
 struct MiniReaction: Equatable {
-    /// キャラクター画像名（Asset Catalogの画像名）
-    let imageName: String
     /// 一言コメント
     let text: String
-    /// キャラクターID（重複回避用）
+    /// キャラクターID（画像名はcharacterID.assetImageNameから取得）
     let characterID: CharacterID
     
     init(characterID: CharacterID, text: String) {
         self.characterID = characterID
         self.text = text
-        self.imageName = "mini_\(characterID.rawValue)"
     }
 }

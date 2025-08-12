@@ -86,11 +86,17 @@ struct SaveCompletionPopup: View {
         }
     }
     
+    /// 日付フォーマッター（再利用のためstatic）
+    private static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.locale = Locale.current
+        return formatter
+    }()
+    
     /// 日付フォーマット
     private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd"
-        return formatter.string(from: date)
+        return Self.dateFormatter.string(from: date)
     }
 }
 
