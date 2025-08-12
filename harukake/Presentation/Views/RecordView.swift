@@ -16,7 +16,7 @@ struct RecordView: View {
     @State private var selectedCategory = Category.shokuhi
     @State private var amount = ""
     @State private var memo = ""
-    @State private var showingComment = false
+    @State private var lastSavedRecord: RecordItem?
     @State private var showingErrorAlert = false
     @State private var errorMessage = ""
     @FocusState private var isAmountFieldFocused: Bool
@@ -59,7 +59,7 @@ struct RecordView: View {
                             HStack {
                                 Text(record.category.displayName)
                                 Spacer()
-                                Text("¥\(record.amount)")
+                                Text(CurrencyFormatter.formatJPY(record.amount))
                             }
                         }
                     }
@@ -69,11 +69,28 @@ struct RecordView: View {
             .onAppear {
                 DebugLogger.logUIAction("RecordView appeared")
             }
-            .sheet(isPresented: $showingComment) {
-                CommentView(comment: appState.currentComment) {
-                    DebugLogger.logUIAction("Closing CommentSheet")
-                    appState.clearComment()
-                    showingComment = false
+            .sheet(item: $lastSavedRecord) { record in
+                if let miniReaction = appState.currentMiniReaction {
+                    SaveCompletionPopup(
+                        record: record,
+                        miniReaction: miniReaction,
+                        onComplete: {
+                            DebugLogger.logUIAction("Save completion popup closed")
+                            closeSaveCompletion()
+                        },
+                        onEdit: {
+                            DebugLogger.logUIAction("Edit selected from popup")
+                            // TODO: 編集画面に遷移するロジックを実装
+                            closeSaveCompletion()
+                        },
+                        onContinue: {
+                            DebugLogger.logUIAction("Continue input selected from popup")
+                            closeSaveCompletion()
+                            clearForm()
+                        }
+                    )
+                } else {
+                    EmptyView()
                 }
             }
             .alert("入力エラー", isPresented: $showingErrorAlert) {
@@ -105,10 +122,9 @@ struct RecordView: View {
         )
 
         switch result {
-        case .success:
-            clearForm()
-            DebugLogger.logUIAction("Opening CommentSheet")
-            showingComment = true
+        case .success(let record):
+            lastSavedRecord = record
+            DebugLogger.logUIAction("Opening SaveCompletionPopup")
         case .failure(let error):
             showError(error.localizedDescription + "\n\n" + (error.recoverySuggestion ?? ""))
         }
@@ -126,38 +142,12 @@ struct RecordView: View {
         amount = ""
         memo = ""
     }
-}
-
-struct CommentView: View {
-    let comment: Comment?
-    let onClose: () -> Void
-
-    var body: some View {
-        VStack(spacing: 20) {
-            Text("💬 キャラクターコメント")
-                .font(.headline)
-
-            if let comment = comment {
-                VStack(spacing: 10) {
-                    Text(comment.character.displayName)
-                        .font(.title2)
-                        .fontWeight(.bold)
-
-                    Text("\"\(comment.message)\"")
-                        .font(.body)
-                        .multilineTextAlignment(.center)
-                        .padding()
-                        .background(Color.secondary.opacity(0.1))
-                        .cornerRadius(10)
-                }
-            }
-
-            Button("閉じる") {
-                onClose()
-            }
-            .buttonStyle(.borderedProminent)
-        }
-        .padding()
+    
+    /// 保存完了ポップアップを閉じる
+    private func closeSaveCompletion() {
+        appState.clearComment()
+        appState.clearMiniReaction()
+        lastSavedRecord = nil
     }
 }
 

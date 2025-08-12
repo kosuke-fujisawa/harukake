@@ -11,8 +11,9 @@
 //  Non-commercial use only.
 //
 
-import SwiftUI
 import Foundation
+import Combine
+import SwiftUI
 
 /// 吹き出しの表示位置
 enum BubbleSide: CaseIterable {

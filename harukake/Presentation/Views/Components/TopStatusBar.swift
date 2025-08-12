@@ -38,16 +38,8 @@ struct TopStatusBar: View {
         .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
     }
     
-    private static let currencyFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.locale = Locale(identifier: "ja_JP")
-        formatter.maximumFractionDigits = 0
-        return formatter
-    }()
-    
     private func formatCurrency(_ amount: Int) -> String {
-        return Self.currencyFormatter.string(from: NSNumber(value: amount)) ?? "¥0"
+        return CurrencyFormatter.formatJPY(amount)
     }
 }
 

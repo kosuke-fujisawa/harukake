@@ -34,7 +34,7 @@ struct AnalyticsView: View {
                         .font(.headline)
 
                     HStack {
-                        Text("食費: +2,000円")
+                        Text("食費: +\(CurrencyFormatter.formatWithSeparator(2000))")
                         Spacer()
                         Text("📈")
                     }
@@ -66,7 +66,7 @@ struct CategorySummaryRow: View {
                 .frame(width: 4, height: 20)
             Text(category)
             Spacer()
-            Text("¥\(amount.formatted())")
+            Text(CurrencyFormatter.formatJPY(amount))
                 .fontWeight(.medium)
         }
     }

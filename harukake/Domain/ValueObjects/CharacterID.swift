@@ -11,10 +11,8 @@
 //  Non-commercial use only.
 //
 
-import Foundation
-
 /// キャラクターIDを表す値オブジェクト
-enum CharacterID: String, CaseIterable, Equatable, Hashable {
+enum CharacterID: String, CaseIterable, Sendable {
     case hikari = "ひかり"
     case reina = "れいな"
     case mayu = "まゆ"
