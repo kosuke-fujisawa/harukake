@@ -14,7 +14,7 @@ struct SettingsView: View {
     @State private var nickname = "田中"
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section("プロフィール") {
                     HStack {

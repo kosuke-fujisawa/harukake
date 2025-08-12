@@ -12,7 +12,7 @@ import SwiftUI
 
 struct StoryView: View {
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 Section("メイン Lv.1/100") {
                     StoryRow(title: "第1章「始まり」", isUnlocked: true, requirement: "")

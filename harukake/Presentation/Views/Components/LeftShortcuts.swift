@@ -113,7 +113,7 @@ struct CircleButton: View {
 /// Tips表示用の簡易ビュー
 struct TipsView: View {
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 20) {
                 Text("💡 お役立ちTips")
                     .font(.title2)

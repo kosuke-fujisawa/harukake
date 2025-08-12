@@ -64,12 +64,12 @@ class AppStateObservable: ObservableObject {
     }
 
     /// コメントを生成（Action）
-    func generateComment(for record: RecordItem) -> Comment? {
+    func generateComment(for record: RecordItem) -> Comment {
         return commentUseCase.generateComment(for: record)
     }
 
     /// ミニリアクションを生成（Action）
-    func generateMiniReaction(for record: RecordItem) -> MiniReaction? {
+    func generateMiniReaction(for record: RecordItem) -> MiniReaction {
         return reactionEngine.getMiniReaction(for: record)
     }
 

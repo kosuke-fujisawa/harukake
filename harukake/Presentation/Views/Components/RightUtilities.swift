@@ -89,7 +89,7 @@ struct RightUtilities: View {
 /// ヘルプ表示用の簡易ビュー
 struct HelpView: View {
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 20) {
                 Text("❓ ヘルプ")
                     .font(.title2)

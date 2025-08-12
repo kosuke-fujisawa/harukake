@@ -125,11 +125,20 @@ struct RecordView: View {
 
         switch result {
         case .success(let record):
-            // コメントとミニリアクションを生成
-            currentComment = appState.generateComment(for: record)
-            currentMiniReaction = appState.generateMiniReaction(for: record)
-            lastSavedRecord = record
-            DebugLogger.logUIAction("Opening SaveCompletionPopup")
+            // コメントとミニリアクションを生成（非Optional）
+            let comment = appState.generateComment(for: record)
+            let reaction = appState.generateMiniReaction(for: record)
+            currentComment = comment
+            currentMiniReaction = reaction
+            
+            // ポリシーベースの表示判定
+            let policy = SaveCompletionPolicy()
+            if policy.shouldShowPopup(for: record, comment: comment, reaction: reaction) {
+                lastSavedRecord = record
+                DebugLogger.logUIAction("Opening SaveCompletionPopup")
+            } else {
+                DebugLogger.logUIAction("SaveCompletionPopup suppressed by policy")
+            }
         case .failure(let error):
             showError(error.localizedDescription + "\n\n" + (error.recoverySuggestion ?? ""))
         }

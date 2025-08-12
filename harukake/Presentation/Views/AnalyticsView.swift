@@ -13,7 +13,7 @@ import SwiftUI
 struct AnalyticsView: View {
     @EnvironmentObject var appState: AppStateObservable
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 20) {
                 Text("現在の分析")
                     .font(.title2)
