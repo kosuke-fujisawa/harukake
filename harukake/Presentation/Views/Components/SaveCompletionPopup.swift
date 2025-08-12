@@ -76,7 +76,7 @@ struct SaveCompletionPopup: View {
                 .background(Color.blue.opacity(0.1))
                 .cornerRadius(4)
             
-            Text("¥\(record.amount)")
+            Text(CurrencyFormatter.formatJPY(record.amount))
                 .font(.caption)
                 .fontWeight(.semibold)
             

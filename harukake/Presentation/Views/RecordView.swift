@@ -60,7 +60,7 @@ struct RecordView: View {
                             HStack {
                                 Text(record.category.displayName)
                                 Spacer()
-                                Text("¥\(record.amount)")
+                                Text(CurrencyFormatter.formatJPY(record.amount))
                             }
                         }
                     }

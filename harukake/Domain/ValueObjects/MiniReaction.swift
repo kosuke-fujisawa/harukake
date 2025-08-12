@@ -14,7 +14,7 @@
 import Foundation
 
 /// ミニキャラクター＋コメント表示用の値オブジェクト
-struct MiniReaction: Equatable {
+struct MiniReaction: Equatable, Sendable {
     /// 一言コメント
     let text: String
     /// キャラクターID（画像名はcharacterID.assetImageNameから取得）
