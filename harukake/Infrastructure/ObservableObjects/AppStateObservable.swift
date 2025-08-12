@@ -25,15 +25,18 @@ class AppStateObservable: ObservableObject {
         }
     }
     @Published var currentComment: Comment?
+    @Published var currentMiniReaction: MiniReaction?
 
     private let recordUseCase: RecordUseCase
     private let commentUseCase: CommentGenerationUseCase
+    private let reactionEngine: ReactionEngine
     private let repository: RecordRepositoryProtocol
 
     init(repository: RecordRepositoryProtocol = InMemoryRecordRepository()) {
         self.repository = repository
         self.recordUseCase = RecordUseCase(repository: repository)
         self.commentUseCase = CommentGenerationUseCase()
+        self.reactionEngine = ReactionEngine()
 
         DebugLogger.logDataAction("AppStateObservable initialized with repository: \(type(of: repository))")
         loadRecords()
@@ -47,6 +50,7 @@ class AppStateObservable: ObservableObject {
         case .success(let record):
             loadRecords()
             generateComment(for: record)
+            generateMiniReaction(for: record)
             return .success(record)
         case .failure(let error):
             DebugLogger.logError("Failed to add record in AppStateObservable: \(error.localizedDescription)")
@@ -64,9 +68,19 @@ class AppStateObservable: ObservableObject {
         currentComment = commentUseCase.generateComment(for: record)
     }
 
+    /// ミニリアクションを生成
+    private func generateMiniReaction(for record: RecordItem) {
+        currentMiniReaction = reactionEngine.getMiniReaction(for: record)
+    }
+
     /// コメントをクリア
     func clearComment() {
         currentComment = nil
+    }
+
+    /// ミニリアクションをクリア
+    func clearMiniReaction() {
+        currentMiniReaction = nil
     }
 
     /// 月次合計金額を計算

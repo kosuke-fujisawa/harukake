@@ -25,4 +25,15 @@ enum CharacterID: String, CaseIterable, Equatable, Hashable {
     var displayName: String {
         return rawValue
     }
+    
+    /// アセット画像名を取得（SDキャラ用）
+    var assetImageName: String {
+        switch self {
+        case .hikari: return "sd_hikari"
+        case .reina: return "sd_reina"
+        case .mayu: return "sd_mayu"
+        case .makoto: return "sd_makoto"
+        case .daichi: return "sd_daichi"
+        }
+    }
 }

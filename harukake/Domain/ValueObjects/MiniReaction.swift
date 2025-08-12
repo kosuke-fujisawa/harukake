@@ -11,7 +11,7 @@
 //  Non-commercial use only.
 //
 
-import SwiftUI
+import Foundation
 
 /// ミニキャラクター＋コメント表示用の値オブジェクト
 struct MiniReaction: Equatable {
