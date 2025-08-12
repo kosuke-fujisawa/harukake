@@ -16,7 +16,6 @@ struct RecordView: View {
     @State private var selectedCategory = Category.shokuhi
     @State private var amount = ""
     @State private var memo = ""
-    @State private var showingSaveCompletion = false
     @State private var lastSavedRecord: RecordItem?
     @State private var showingErrorAlert = false
     @State private var errorMessage = ""
@@ -70,9 +69,8 @@ struct RecordView: View {
             .onAppear {
                 DebugLogger.logUIAction("RecordView appeared")
             }
-            .sheet(isPresented: $showingSaveCompletion) {
-                if let record = lastSavedRecord,
-                   let miniReaction = appState.currentMiniReaction {
+            .sheet(item: $lastSavedRecord) { record in
+                if let miniReaction = appState.currentMiniReaction {
                     SaveCompletionPopup(
                         record: record,
                         miniReaction: miniReaction,
@@ -91,6 +89,8 @@ struct RecordView: View {
                             clearForm()
                         }
                     )
+                } else {
+                    EmptyView()
                 }
             }
             .alert("入力エラー", isPresented: $showingErrorAlert) {
@@ -125,7 +125,6 @@ struct RecordView: View {
         case .success(let record):
             lastSavedRecord = record
             DebugLogger.logUIAction("Opening SaveCompletionPopup")
-            showingSaveCompletion = true
         case .failure(let error):
             showError(error.localizedDescription + "\n\n" + (error.recoverySuggestion ?? ""))
         }
@@ -148,7 +147,6 @@ struct RecordView: View {
     private func closeSaveCompletion() {
         appState.clearComment()
         appState.clearMiniReaction()
-        showingSaveCompletion = false
         lastSavedRecord = nil
     }
 }

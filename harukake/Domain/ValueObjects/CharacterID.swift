@@ -11,10 +11,8 @@
 //  Non-commercial use only.
 //
 
-import Foundation
-
 /// キャラクターIDを表す値オブジェクト
-enum CharacterID: String, CaseIterable, Equatable, Hashable, Sendable {
+enum CharacterID: String, CaseIterable, Sendable {
     case hikari = "ひかり"
     case reina = "れいな"
     case mayu = "まゆ"
@@ -24,16 +22,5 @@ enum CharacterID: String, CaseIterable, Equatable, Hashable, Sendable {
     /// 表示名を取得
     var displayName: String {
         return rawValue
-    }
-    
-    /// アセット画像名を取得（SDキャラ用）
-    var assetImageName: String {
-        switch self {
-        case .hikari: return "sd_hikari"
-        case .reina: return "sd_reina"
-        case .mayu: return "sd_mayu"
-        case .makoto: return "sd_makoto"
-        case .daichi: return "sd_daichi"
-        }
     }
 }

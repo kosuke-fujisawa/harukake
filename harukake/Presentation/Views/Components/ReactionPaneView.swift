@@ -54,7 +54,7 @@ struct ReactionPaneView: View {
     /// キャラクター画像のViewBuilder
     @ViewBuilder
     private var characterImage: some View {
-        let imageName = reaction.characterID.assetImageName
+        let imageName = AssetImageValidator.safeImageName(for: reaction.characterID)
         
         if let uiImage = UIImage(named: imageName, in: bundle, with: nil) {
             Image(uiImage: uiImage)
