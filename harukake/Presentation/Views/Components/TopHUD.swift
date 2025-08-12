@@ -22,7 +22,7 @@ struct TopHUD: View {
                 Text("Lv")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Text("\(appState.currentLevel)")
+                Text("\(min(1 + appState.records.count / 10, 99))")
                     .font(.headline)
                     .monospacedDigit()
             }

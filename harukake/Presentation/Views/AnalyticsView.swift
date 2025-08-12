@@ -11,38 +11,61 @@
 import SwiftUI
 
 struct AnalyticsView: View {
+    @EnvironmentObject var appState: AppStateObservable
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 20) {
-                Text("2025年1月")
+                Text("現在の分析")
                     .font(.title2)
                     .padding()
 
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("カテゴリ別合計")
-                        .font(.headline)
-
-                    CategorySummaryRow(category: "食費", amount: 25000, color: .blue)
-                    CategorySummaryRow(category: "家賃", amount: 80000, color: .orange)
-                    CategorySummaryRow(category: "光熱", amount: 6000, color: .green)
-                    CategorySummaryRow(category: "通信", amount: 4000, color: .purple)
-                }
-                .padding()
-
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("前月比")
-                        .font(.headline)
-
-                    HStack {
-                        Text("食費: +\(CurrencyFormatter.formatWithSeparator(2000))")
-                        Spacer()
-                        Text("📈")
+                if appState.records.isEmpty {
+                    VStack {
+                        Text("まだ記録がありません")
+                            .font(.headline)
+                            .foregroundStyle(.secondary)
+                        Text("記録を追加すると分析が表示されます")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
-                    Text("「今月は外食多め？」")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    .padding()
+                } else {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("カテゴリ別合計")
+                            .font(.headline)
+
+                        let categoryTotals = appState.calculateCategoryTotals(for: Date())
+                        
+                        ForEach(
+                            Array(categoryTotals.keys).sorted(by: { $0.displayName < $1.displayName }),
+                            id: \.self
+                        ) { category in
+                            if let amount = categoryTotals[category], amount > 0 {
+                                CategorySummaryRow(
+                                    category: category.displayName,
+                                    amount: amount,
+                                    color: CategoryColorPalette.color(for: category)
+                                )
+                            }
+                        }
+                    }
+                    .padding()
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("月合計")
+                            .font(.headline)
+                        
+                        let monthlyTotal = appState.calculateMonthlyTotal(for: Date())
+                        HStack {
+                            Text("合計支出: \(CurrencyFormatter.formatJPY(monthlyTotal))")
+                            Spacer()
+                        }
+                        Text("「記録数: \(appState.records.count) 件」")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding()
                 }
-                .padding()
 
                 Spacer()
             }
@@ -74,4 +97,5 @@ struct CategorySummaryRow: View {
 
 #Preview {
     AnalyticsView()
+        .environmentObject(AppStateObservable.mock())
 }

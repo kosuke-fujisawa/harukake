@@ -69,7 +69,7 @@ struct PresentButton: View {
 /// 将来的に本格実装予定
 struct PresentBoxSheet: View {
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 20) {
                 Image(systemName: "gift.fill")
                     .font(.system(size: 64))

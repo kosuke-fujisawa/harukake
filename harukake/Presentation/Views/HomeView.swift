@@ -12,7 +12,7 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject private var cgController = CGBackgroundController()
-    @StateObject private var appState = AppStateObservable()
+    @EnvironmentObject var appState: AppStateObservable
     @StateObject private var bubbleVM = HomeBubbleVM()
     @State private var showingRecord = false
     @State private var showingAnalytics = false
@@ -123,6 +123,9 @@ struct HomeView: View {
             await cgController.preload()
             cgController.updateForTimeOfDay()
         }
+        .onAppear {
+            appState.loadInitialData()
+        }
         .sheet(isPresented: $showingRecord) {
             RecordView()
         }
@@ -149,4 +152,5 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
+        .environmentObject(AppStateObservable.mock())
 }

@@ -11,12 +11,14 @@
 import SwiftUI
 
 struct RecordView: View {
-    @StateObject private var appState = AppStateObservable()
+    @EnvironmentObject var appState: AppStateObservable
     @State private var selectedDate = Date()
     @State private var selectedCategory = Category.shokuhi
     @State private var amount = ""
     @State private var memo = ""
     @State private var lastSavedRecord: RecordItem?
+    @State private var currentComment: Comment?
+    @State private var currentMiniReaction: MiniReaction?
     @State private var showingErrorAlert = false
     @State private var errorMessage = ""
     @FocusState private var isAmountFieldFocused: Bool
@@ -50,7 +52,11 @@ struct RecordView: View {
                         saveRecord()
                     }
                     .frame(maxWidth: .infinity)
-                    .disabled(amount.isEmpty)
+                    .disabled({
+                        let trimmed = amount.trimmingCharacters(in: .whitespacesAndNewlines)
+                        guard let value = Int(trimmed), value > 0 else { return true }
+                        return false
+                    }())
                 }
 
                 if !appState.records.isEmpty {
@@ -70,7 +76,7 @@ struct RecordView: View {
                 DebugLogger.logUIAction("RecordView appeared")
             }
             .sheet(item: $lastSavedRecord) { record in
-                if let miniReaction = appState.currentMiniReaction {
+                if let miniReaction = currentMiniReaction {
                     SaveCompletionPopup(
                         record: record,
                         miniReaction: miniReaction,
@@ -109,8 +115,8 @@ struct RecordView: View {
     private func saveRecord() {
         let trimmedAmount = amount.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        guard let amountValue = Int(trimmedAmount) else {
-            showError("金額には数値を入力してください。\n例：1000、500")
+        guard let amountValue = Int(trimmedAmount), amountValue > 0 else {
+            showError("金額には正の数値を入力してください。\n例：1000、500")
             return
         }
 
@@ -123,8 +129,24 @@ struct RecordView: View {
 
         switch result {
         case .success(let record):
-            lastSavedRecord = record
-            DebugLogger.logUIAction("Opening SaveCompletionPopup")
+            // コメントとミニリアクションを生成（非Optional）
+            let comment = appState.generateComment(for: record)
+            let reaction = appState.generateMiniReaction(for: record)
+            let ctx = SavePopupContext(record: record, comment: comment, reaction: reaction)
+            
+            // ポリシーベースの表示判定
+            let policy = SaveCompletionPolicy()
+            if policy.shouldShowPopup(ctx) {
+                currentComment = comment
+                currentMiniReaction = reaction
+                lastSavedRecord = record
+                DebugLogger.logUIAction("Opening SaveCompletionPopup")
+            } else {
+                // 不表示ならUI状態は汚さない（代入しない／前回分は明示的にクリア）
+                currentComment = nil
+                currentMiniReaction = nil
+                DebugLogger.logUIAction("SaveCompletionPopup suppressed by policy")
+            }
         case .failure(let error):
             showError(error.localizedDescription + "\n\n" + (error.recoverySuggestion ?? ""))
         }
@@ -145,12 +167,13 @@ struct RecordView: View {
     
     /// 保存完了ポップアップを閉じる
     private func closeSaveCompletion() {
-        appState.clearComment()
-        appState.clearMiniReaction()
+        currentComment = nil
+        currentMiniReaction = nil
         lastSavedRecord = nil
     }
 }
 
 #Preview {
     RecordView()
+        .environmentObject(AppStateObservable.mock())
 }

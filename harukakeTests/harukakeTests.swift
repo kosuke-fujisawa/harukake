@@ -153,4 +153,14 @@ struct HarukakeTests {
         #expect(categoryTotals[Category.koutuu] == 300)
         #expect(categoryTotals[Category.gouraku] == nil)
     }
+    
+    /// SaveCompletionPolicyのテスト：デフォルトでtrue
+    @Test func testSaveCompletionPolicy_shouldShowPopup_returnsTrue() async throws {
+        let policy = SaveCompletionPolicy()
+        let record = RecordItem(date: Date(), category: Category.shokuhi, amount: 1000, memo: "テスト")
+        let comment = Comment(character: CharacterID.hikari, message: "テストコメント")
+        let reaction = MiniReaction(characterID: CharacterID.hikari, text: "テストリアクション")
+        
+        #expect(policy.shouldShowPopup(for: record, comment: comment, reaction: reaction) == true)
+    }
 }
