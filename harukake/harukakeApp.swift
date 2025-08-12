@@ -26,10 +26,12 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct HarukakeApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @StateObject private var appState = AppStateObservable()
     
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(appState)
         }
     }
 }

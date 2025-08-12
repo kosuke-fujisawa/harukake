@@ -17,8 +17,9 @@ struct MonthlyTripleBars: View {
     @State private var showingAnalytics = false
     
     var body: some View {
-        let income = max(appState.currentMonthIncome, 0)
-        let expense = max(appState.currentMonthExpense, 0)
+        // TODO: AnalyticsQueryService実装時に復活させる
+        let income = 0.0 // プレースホルダー
+        let expense = Double(appState.records.reduce(0) { $0 + $1.amount })
         let balance = income - expense
         
         let maxValue = max(abs(income), abs(expense), abs(balance), 10000) // 最小10000で確実に表示

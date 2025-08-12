@@ -11,12 +11,14 @@
 import SwiftUI
 
 struct RecordView: View {
-    @StateObject private var appState = AppStateObservable()
+    @EnvironmentObject var appState: AppStateObservable
     @State private var selectedDate = Date()
     @State private var selectedCategory = Category.shokuhi
     @State private var amount = ""
     @State private var memo = ""
     @State private var lastSavedRecord: RecordItem?
+    @State private var currentComment: Comment?
+    @State private var currentMiniReaction: MiniReaction?
     @State private var showingErrorAlert = false
     @State private var errorMessage = ""
     @FocusState private var isAmountFieldFocused: Bool
@@ -70,7 +72,7 @@ struct RecordView: View {
                 DebugLogger.logUIAction("RecordView appeared")
             }
             .sheet(item: $lastSavedRecord) { record in
-                if let miniReaction = appState.currentMiniReaction {
+                if let miniReaction = currentMiniReaction {
                     SaveCompletionPopup(
                         record: record,
                         miniReaction: miniReaction,
@@ -123,6 +125,9 @@ struct RecordView: View {
 
         switch result {
         case .success(let record):
+            // コメントとミニリアクションを生成
+            currentComment = appState.generateComment(for: record)
+            currentMiniReaction = appState.generateMiniReaction(for: record)
             lastSavedRecord = record
             DebugLogger.logUIAction("Opening SaveCompletionPopup")
         case .failure(let error):
@@ -145,8 +150,8 @@ struct RecordView: View {
     
     /// 保存完了ポップアップを閉じる
     private func closeSaveCompletion() {
-        appState.clearComment()
-        appState.clearMiniReaction()
+        currentComment = nil
+        currentMiniReaction = nil
         lastSavedRecord = nil
     }
 }

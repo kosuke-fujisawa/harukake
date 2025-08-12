@@ -17,47 +17,24 @@ struct MonthlyBarSparkline: View {
     let height: CGFloat
     
     var body: some View {
-        let data = appState.currentMonthDailyNet
-        let maxAbsValue = max(1, data.compactMap { abs($0) }.max() ?? 1)
-        
-        HStack(spacing: 2) {
-            // 日別棒グラフ
-            ForEach(Array(data.enumerated()), id: \.offset) { _, value in
-                VStack(spacing: 0) {
-                    // 上向き（収入・黒字部分）
-                    Rectangle()
-                        .fill(Color.primary.opacity(0.85))
-                        .frame(height: value > 0 ? CGFloat(value / maxAbsValue) * (height * 0.4) : 0)
-                    
-                    // 中央基準線
-                    Rectangle()
-                        .fill(Color.clear)
-                        .frame(height: 1)
-                    
-                    // 下向き（支出・赤字部分）
-                    Rectangle()
-                        .fill(Color.red.opacity(0.85))
-                        .frame(height: value < 0 ? CGFloat(-value / maxAbsValue) * (height * 0.4) : 0)
-                }
-                .frame(width: max(1, barWidth(for: data.count)))
-            }
+        // TODO: AnalyticsQueryService実装時に復活させる
+        // 一時的にプレースホルダー表示
+        HStack {
+            Text("月次グラフ（準備中）")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
             
-            Spacer(minLength: 8)
+            Spacer()
             
-            // 右端サマリーテキスト
-            VStack(alignment: .trailing, spacing: 2) {
-                Text(appState.monthSummaryText)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.trailing)
-            }
+            Text("記録数: \(appState.records.count)")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
         }
         .frame(height: height)
         .padding(.horizontal, 16)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
         .contentShape(Rectangle())
         .onTapGesture {
-            // 詳細分析画面への遷移（今回はプレースホルダー）
             DebugLogger.logUIAction("MonthlyBarSparkline tapped - navigating to monthly analytics")
         }
     }
