@@ -71,7 +71,12 @@ final class AppStateObservable: ObservableObject {
 
     /// 全記録を再読み込み
     private func loadRecords() {
-        records = recordUseCase.getAllRecords()
+        // 取得が軽いならこのままでも可。重い場合は以下の形に。
+        let fetched = recordUseCase.getAllRecords()
+        // 取得は任意スレッドでも、代入は明示的にメインへ
+        Task { @MainActor in 
+            self.records = fetched 
+        }
     }
 
     /// コメントを生成（Action）

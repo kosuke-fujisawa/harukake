@@ -52,7 +52,11 @@ struct RecordView: View {
                         saveRecord()
                     }
                     .frame(maxWidth: .infinity)
-                    .disabled(Decimal(string: amount.trimmingCharacters(in: .whitespacesAndNewlines)) == nil)
+                    .disabled({
+                        let trimmed = amount.trimmingCharacters(in: .whitespacesAndNewlines)
+                        guard let value = Int(trimmed), value > 0 else { return true }
+                        return false
+                    }())
                 }
 
                 if !appState.records.isEmpty {
@@ -111,8 +115,8 @@ struct RecordView: View {
     private func saveRecord() {
         let trimmedAmount = amount.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        guard let amountValue = Int(trimmedAmount) else {
-            showError("金額には数値を入力してください。\n例：1000、500")
+        guard let amountValue = Int(trimmedAmount), amountValue > 0 else {
+            showError("金額には正の数値を入力してください。\n例：1000、500")
             return
         }
 
@@ -128,15 +132,19 @@ struct RecordView: View {
             // コメントとミニリアクションを生成（非Optional）
             let comment = appState.generateComment(for: record)
             let reaction = appState.generateMiniReaction(for: record)
-            currentComment = comment
-            currentMiniReaction = reaction
+            let ctx = SavePopupContext(record: record, comment: comment, reaction: reaction)
             
             // ポリシーベースの表示判定
             let policy = SaveCompletionPolicy()
-            if policy.shouldShowPopup(for: record, comment: comment, reaction: reaction) {
+            if policy.shouldShowPopup(ctx) {
+                currentComment = comment
+                currentMiniReaction = reaction
                 lastSavedRecord = record
                 DebugLogger.logUIAction("Opening SaveCompletionPopup")
             } else {
+                // 不表示ならUI状態は汚さない（代入しない／前回分は明示的にクリア）
+                currentComment = nil
+                currentMiniReaction = nil
                 DebugLogger.logUIAction("SaveCompletionPopup suppressed by policy")
             }
         case .failure(let error):
