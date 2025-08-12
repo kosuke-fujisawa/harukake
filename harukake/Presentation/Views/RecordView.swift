@@ -52,7 +52,7 @@ struct RecordView: View {
                         saveRecord()
                     }
                     .frame(maxWidth: .infinity)
-                    .disabled(amount.isEmpty)
+                    .disabled(Decimal(string: amount.trimmingCharacters(in: .whitespacesAndNewlines)) == nil)
                 }
 
                 if !appState.records.isEmpty {
@@ -167,4 +167,5 @@ struct RecordView: View {
 
 #Preview {
     RecordView()
+        .environmentObject(AppStateObservable.mock())
 }

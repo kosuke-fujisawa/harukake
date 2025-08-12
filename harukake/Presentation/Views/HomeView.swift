@@ -152,4 +152,5 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
+        .environmentObject(AppStateObservable.mock())
 }

@@ -35,16 +35,6 @@ struct AnalyticsView: View {
                             .font(.headline)
 
                         let categoryTotals = appState.calculateCategoryTotals(for: Date())
-                        let colors: [Category: Color] = [
-                            .shokuhi: .blue,
-                            .yatin: .orange,
-                            .koutuu: .green,
-                            .gouraku: .purple,
-                            .tuusin: .red,
-                            .kounetu: .mint,
-                            .nichiyouhin: .pink,
-                            .sonota: .gray
-                        ]
                         
                         ForEach(
                             Array(categoryTotals.keys).sorted(by: { $0.displayName < $1.displayName }),
@@ -54,7 +44,7 @@ struct AnalyticsView: View {
                                 CategorySummaryRow(
                                     category: category.displayName,
                                     amount: amount,
-                                    color: colors[category] ?? .gray
+                                    color: CategoryColorPalette.color(for: category)
                                 )
                             }
                         }
@@ -107,5 +97,5 @@ struct CategorySummaryRow: View {
 
 #Preview {
     AnalyticsView()
-        .environmentObject(AppStateObservable())
+        .environmentObject(AppStateObservable.mock())
 }
